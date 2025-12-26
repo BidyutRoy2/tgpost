@@ -1,8 +1,8 @@
 # Telegram Channel Post Auto Forward to Another Channel Bot
 
 # Setup Guide
-- Open Telegram Search https://t.me/BotFather
-- Create a New Bot
+- Open > https://t.me/BotFather
+- Open & Create a New Bot
 - Copy Your Access Token (Don't Share)
 - Copy Your Bot Username & Ad Admin Your All TG Channel (Manage Messaged - Post & Edit)
 - Go To Your Main Channel & Otherrs

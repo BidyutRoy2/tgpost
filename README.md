@@ -1,6 +1,6 @@
 # Telegram Channel Post Auto Forward to Another Channel Bot
 
-# Setup Guide
+## Setup Guide
 - Open > https://t.me/BotFather
 - Open & Create a New Bot
 - Copy Your Access Token (Don't Share)
@@ -27,7 +27,7 @@ To Stop
 CRTL+C
 ```
 
-# PROJECT STRUCTURE
+### PROJECT STRUCTURE
 - tgpost/
 - ├── index.js
 - ├── package.json

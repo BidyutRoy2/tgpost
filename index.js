@@ -42,12 +42,12 @@ async function progressIntro() {
 
 async function pulseLogo() {
   const logo = `
-██╗  ██╗██╗██████╗ ██████╗ ███████╗
-██║  ██║██║██╔══██╗██╔══██╗██╔════╝
-███████║██║██║  ██║██║  ██║█████╗
-██╔══██║██║██║  ██║██║  ██║██╔══╝
-██║  ██║██║██████╔╝██████╔╝███████╗
-╚═╝  ╚═╝╚═╝╚═════╝ ╚═════╝ ╚══════╝
+██╗  ██╗██╗██████╗ ██████╗ ███████╗███╗   ██╗     ██████╗ ███████╗███╗   ███╗
+██║  ██║██║██╔══██╗██╔══██╗██╔════╝████╗  ██║    ██╔════╝ ██╔════╝████╗ ████║
+███████║██║██║  ██║██║  ██║█████╗  ██╔██╗ ██║    ██║  ███╗█████╗  ██╔████╔██║
+██╔══██║██║██║  ██║██║  ██║██╔══╝  ██║╚██╗██║    ██║   ██║██╔══╝  ██║╚██╔╝██║
+██║  ██║██║██████╔╝██████╔╝███████╗██║ ╚████║    ╚██████╔╝███████╗██║ ╚═╝ ██║
+╚═╝  ╚═╝╚═╝╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝     ╚═════╝ ╚══════╝╚═╝HiddenGem
 `;
 
   const aurora = gradient([
@@ -87,12 +87,12 @@ function showDashboard() {
   console.log(
     boxen(
       gradient.rainbow.multiline(
-`💎 HIDDEN GEM AUTO FORWARD BOT
+`💎 HIDDENGEM TG POST AUTO FORWARD BOT 💎
 
-🔒 STATUS : ACTIVE
-📡 MAIN   : ${MAIN_CHANNEL_ID}
-🎯 TARGET : ${TARGET_CHANNELS.join(", ")}
-⏱ DELAY  : ${DELAY_MS / 1000}s
+🔒 Status : Active
+📡 Main Channel ID   : ${MAIN_CHANNEL_ID}
+🎯 Target Channel ID : ${TARGET_CHANNELS.join(", ")}
+⏱ Post Delay  : ${DELAY_MS / 1000}s
 ⚙ MODE   : QUEUE • SAFE`
       ),
       { padding: 1, borderStyle: "double", borderColor: "magenta" }
@@ -141,7 +141,7 @@ async function main() {
       }
     }
 
-    spinner.succeed(`✅ Forwarded → ${msgId}`);
+    spinner.succeed(`✅ Forwarded Done → ${msgId}`);
     processing = false;
     processQueue();
   }

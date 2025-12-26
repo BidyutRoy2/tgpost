@@ -1,4 +1,4 @@
-# 💎 HiddenGem Telegram Channel Post Auto Forward to Another Channel Bot
+# Telegram Channel Post Auto Forward to Another Channel Bot
 
 ## Features
 - Aurora-plasma animated logo

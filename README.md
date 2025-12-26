@@ -1,17 +1,16 @@
 # Telegram Channel Post Auto Forward to Another Channel Bot
 
 ```
-
+git clone https://github.com/BidyutRoy2/tgpost.git && cd tgpost
 ```
-
 ```
 npm install
 ```
-- Start Bot
+Start Bot
 ```
 npm start
 ```
-- To Stop
+To Stop
 ```
 CRTL+C
 ```

@@ -6,7 +6,7 @@
 - Copy Your Access Token (Don't Share)
 - Copy Your Bot Username & Ad Admin Your All TG Channel (Manage Messaged - Post & Edit)
 - Go To Your Main Channel & Otherrs
-- Share Any Post @userinfobot To Get ID
+- Share Any Post @userinfobot To Get Channel ID
 
 ```
 git clone https://github.com/BidyutRoy2/tgpost.git && cd tgpost

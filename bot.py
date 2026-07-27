@@ -18,14 +18,16 @@ def load_posted():
     if os.path.exists(POSTED_FILE):
         try:
             with open(POSTED_FILE, "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, list) else []
         except Exception:
             return []
     return []
 
 def save_posted(posted_ids):
     with open(POSTED_FILE, "w") as f:
-        json.dump(posted_ids, f, indent=4)
+        # শুধু শেষ ১০০টি আইডি সেভ রাখবে যাতে ফাইল ভারী না হয়
+        json.dump(posted_ids[-100:], f, indent=4)
 
 async def main():
     if not BOT_TOKEN or not MAIN_CHANNEL_ID or not TARGET_CHANNELS:
@@ -34,51 +36,42 @@ async def main():
 
     bot = Bot(token=BOT_TOKEN)
     posted_ids = load_posted()
-    new_posted = list(posted_ids)
+    
+    # লাস্ট সেভ করা মেসেজ আইডি থেকে চেক শুরু করবে
+    last_id = max(posted_ids) if posted_ids else 1
+    
+    # বর্তমান রান-এ নতুন ৫-১০টি সম্ভাব্য মেসেজ আইডি স্ক্যান করবে
+    found_any = False
+    
+    for msg_id in range(last_id, last_id + 15):
+        if msg_id in posted_ids and msg_id != last_id:
+            continue
 
-    try:
-        # বট যেগুলোতে অ্যাডমিন আছে তার আপডেটস পড়া
-        updates = await bot.get_updates(limit=100)
-        
-        found_new = False
-        for update in updates:
-            message = update.channel_post or update.edited_channel_post
-            
-            if not message:
-                continue
+        # যেকোনো একটি টার্গেট চ্যানেলে টেস্ট ফরোয়ার্ড করার চেষ্টা করবে
+        forward_success = False
+        for target_id in TARGET_CHANNELS:
+            try:
+                await bot.forward_message(
+                    chat_id=target_id,
+                    from_chat_id=MAIN_CHANNEL_ID,
+                    message_id=msg_id
+                )
+                print(f"Successfully forwarded message {msg_id} to {target_id}")
+                forward_success = True
+                await asyncio.sleep(DELAY_SECONDS)
+            except TelegramError as e:
+                # মেসেজ না থাকলে বা অন্য এরর হলে
+                pass
 
-            # মেইন চ্যানেল আইডি ম্যাচ করা (স্ট্রিং ও ইন্টিজার সাপোর্ট)
-            if str(message.chat.id) == str(MAIN_CHANNEL_ID):
-                msg_id = message.message_id
+        if forward_success:
+            found_any = True
+            if msg_id not in posted_ids:
+                posted_ids.append(msg_id)
 
-                if msg_id in posted_ids:
-                    continue
+    if not found_any:
+        print("No new message found to forward.")
 
-                found_new = True
-                print(f"New message found ID: {msg_id}. Forwarding...")
-
-                for target_id in TARGET_CHANNELS:
-                    try:
-                        await bot.forward_message(
-                            chat_id=target_id,
-                            from_chat_id=MAIN_CHANNEL_ID,
-                            message_id=msg_id
-                        )
-                        print(f"Forwarded to {target_id}")
-                    except TelegramError as e:
-                        print(f"Error forwarding to {target_id}: {e}")
-
-                    await asyncio.sleep(DELAY_SECONDS)
-
-                new_posted.append(msg_id)
-
-        if not found_new:
-            print("No new messages found in main channel.")
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-    save_posted(new_posted)
+    save_posted(posted_ids)
 
 if __name__ == "__main__":
     asyncio.run(main())

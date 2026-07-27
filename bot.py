@@ -37,26 +37,26 @@ async def main():
     new_posted = list(posted_ids)
 
     try:
-        # মেইন চ্যানেলের শেষ আপডেট দেখা
-        updates = await bot.get_updates(offset=-10)
+        # বট যেগুলোতে অ্যাডমিন আছে তার আপডেটস পড়া
+        updates = await bot.get_updates(limit=100)
         
+        found_new = False
         for update in updates:
-            # চ্যানেল পোস্ট বা এডিটেড পোস্ট চেক
             message = update.channel_post or update.edited_channel_post
             
             if not message:
                 continue
 
-            # পোস্টটি যদি নির্দিষ্ট মেইন চ্যানেল থেকে হয়
+            # মেইন চ্যানেল আইডি ম্যাচ করা (স্ট্রিং ও ইন্টিজার সাপোর্ট)
             if str(message.chat.id) == str(MAIN_CHANNEL_ID):
                 msg_id = message.message_id
 
                 if msg_id in posted_ids:
                     continue
 
-                print(f"Forwarding message ID: {msg_id}")
+                found_new = True
+                print(f"New message found ID: {msg_id}. Forwarding...")
 
-                # প্রতিটি টার্গেট চ্যানেলে ফরোয়ার্ড করা
                 for target_id in TARGET_CHANNELS:
                     try:
                         await bot.forward_message(
@@ -64,17 +64,19 @@ async def main():
                             from_chat_id=MAIN_CHANNEL_ID,
                             message_id=msg_id
                         )
-                        print(f"Successfully forwarded to {target_id}")
+                        print(f"Forwarded to {target_id}")
                     except TelegramError as e:
-                        print(f"Failed to forward to {target_id}: {e}")
+                        print(f"Error forwarding to {target_id}: {e}")
 
-                    # সেটআপ করা ডিলে (10000ms = 10s)
                     await asyncio.sleep(DELAY_SECONDS)
 
                 new_posted.append(msg_id)
 
+        if not found_new:
+            print("No new messages found in main channel.")
+
     except Exception as e:
-        print(f"Error checking updates: {e}")
+        print(f"Error: {e}")
 
     save_posted(new_posted)
 

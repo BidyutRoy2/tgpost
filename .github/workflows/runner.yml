@@ -2,7 +2,7 @@ name: Telegram Auto Forwarder
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # প্রতি ৫ মিনিট পর পর ফরোয়ার্ড চেক করবে
+    - cron: '*/5 * * * *'  # প্রতি ৫ মিনিট পর পর অটো রান হবে
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install python-telegram-bot requests
 
       - name: Run Auto Forwarder Bot
         env:

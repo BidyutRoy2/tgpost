@@ -26,7 +26,6 @@ def load_posted():
 
 def save_posted(posted_ids):
     with open(POSTED_FILE, "w") as f:
-        # শুধু শেষ ১০০টি আইডি সেভ রাখবে যাতে ফাইল ভারী না হয়
         json.dump(posted_ids[-100:], f, indent=4)
 
 async def main():
@@ -36,19 +35,33 @@ async def main():
 
     bot = Bot(token=BOT_TOKEN)
     posted_ids = load_posted()
-    
-    # লাস্ট সেভ করা মেসেজ আইডি থেকে চেক শুরু করবে
-    last_id = max(posted_ids) if posted_ids else 1
-    
-    # বর্তমান রান-এ নতুন ৫-১০টি সম্ভাব্য মেসেজ আইডি স্ক্যান করবে
-    found_any = False
-    
-    for msg_id in range(last_id, last_id + 15):
-        if msg_id in posted_ids and msg_id != last_id:
+
+    # ১. মেইন চ্যানেলের লেটেস্ট পোস্টের ID বের করার চেষ্টা
+    latest_msg_id = None
+    try:
+        updates = await bot.get_updates(limit=50)
+        for u in reversed(updates):
+            msg = u.channel_post or u.edited_channel_post
+            if msg and str(msg.chat.id) == str(MAIN_CHANNEL_ID):
+                latest_msg_id = msg.message_id
+                break
+    except Exception as e:
+        print(f"Update check error: {e}")
+
+    # আপডেটসে না পাওয়া গেলে posted.json বা ডিফল্ট ৫০০ থেকে চেক করবে
+    if not latest_msg_id:
+        start_id = max(posted_ids) if posted_ids else 500
+    else:
+        start_id = latest_msg_id - 5
+
+    print(f"Scanning messages starting from ID: {start_id}")
+
+    # ২. মেসেজ আইডি রেঞ্জ চেক করা (গত ১০টি মেসেজ আইডি)
+    for msg_id in range(start_id, start_id + 15):
+        if msg_id in posted_ids:
             continue
 
-        # যেকোনো একটি টার্গেট চ্যানেলে টেস্ট ফরোয়ার্ড করার চেষ্টা করবে
-        forward_success = False
+        forwarded_count = 0
         for target_id in TARGET_CHANNELS:
             try:
                 await bot.forward_message(
@@ -56,20 +69,15 @@ async def main():
                     from_chat_id=MAIN_CHANNEL_ID,
                     message_id=msg_id
                 )
-                print(f"Successfully forwarded message {msg_id} to {target_id}")
-                forward_success = True
+                print(f"-> Successfully forwarded ID {msg_id} to {target_id}")
+                forwarded_count += 1
                 await asyncio.sleep(DELAY_SECONDS)
             except TelegramError as e:
-                # মেসেজ না থাকলে বা অন্য এরর হলে
+                # পোস্ট না থাকলে বা প্রাইভেট চ্যানেলের রেস্ট্রিকশন থাকলে
                 pass
 
-        if forward_success:
-            found_any = True
-            if msg_id not in posted_ids:
-                posted_ids.append(msg_id)
-
-    if not found_any:
-        print("No new message found to forward.")
+        if forwarded_count > 0:
+            posted_ids.append(msg_id)
 
     save_posted(posted_ids)
 
